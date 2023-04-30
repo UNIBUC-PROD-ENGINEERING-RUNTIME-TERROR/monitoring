@@ -2,19 +2,55 @@ groups:
   - name: AppAlerts
     rules:
       - alert: WARNING-HighThroughput
-        expr: rate(hello_info_count_total[1m]) > 10
+        expr: rate(bookstore_review_get_review_broken_count_total[5m]) > 10
         for: 10s
         labels:
           severity: warning
         annotations:
-          summary: Increased info retrieval rate {{ $labels.value}} {{ $value }}
-          description: "A container has disappeared\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+          summary: Increased traffic on endpoint /get-review-broken
+          description: "There are too many requests on this endpoint"
 
       - alert: CRITICAL-HighThroughput
-        expr: rate(hello_info_count_total[1m]) > 50
+        expr: rate(bookstore_review_get_review_broken_count_total[5m]) > 20
         for: 10s
         labels:
           severity: critical
         annotations:
           summary: Increased info retrieval rate {{ $labels.value}} {{ $value }}
           description: "A container has disappeared\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+
+      - alert: WARNING-HighRateOfFailedRequests
+        expr: error_on_return_review_broken_count_total > 3
+        for: 10s
+        labels:
+          severity: warning
+        annotations:
+          summary: Increased number of errors on endpoint /get-review-broken
+          description: "There are too many requests for /get-review-broken who fails. Something on the client side is not working properly"
+
+      - alert: CRITICAL-HighRateOfFailedRequests
+        expr: error_on_return_review_broken_count_total > 7
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: Too many errors on endpoint /get-review-broken
+          description: "There are too many requests for /get-review-broken who fails. Something on the client side is not working properly"
+
+      - alert: WARNING-IncreasedReviewRetrievalRate
+        expr: bookstore_review_get_review_broken_time_seconds_max > 0.3
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: Observing slowness on endpoint /get-review-broken
+          description: "Max time to retrive review on endpoint /get-review-broken is greater than 300ms. System may be overloaded"
+
+      - alert: CRITICAL-IncreasedReviewRetrievalRate
+        expr: bookstore_review_get_review_broken_time_seconds_max > 1
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: Observing crit slowness on endpoint /get-review-broken
+          description: "Max time to retrive review on endpoint /get-review-broken is greater than 1s. System is overloaded"
