@@ -53,4 +53,4 @@ groups:
           severity: critical
         annotations:
           summary: Observing crit slowness on endpoint /get-review-broken
-          description: "Max time to retrive review on endpoint /get-review-broken is greater than 700ms. System is overloaded"
+          description: "Max time to retrive review on endpoint /get-review-broken is greater than 1s. System is overloaded"
